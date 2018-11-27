@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/cloudevents/sdk-go/v01"
+	"github.com/rsmitty/tmevents"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,6 +15,8 @@ var projectEnv string
 var subscriptionEnv string
 var channelEnv string
 var namespaceEnv string
+
+type pubsubMsg struct{}
 
 func main() {
 
@@ -24,12 +26,21 @@ func main() {
 	channelEnv = os.Getenv("CHANNEL")
 	namespaceEnv = os.Getenv("NAMESPACE")
 
+	m := pubsubMsg{}
+	m.ReceiveMsg()
+
+}
+
+//ReceiveMsg implements the the receive interface for pubsub
+func (m pubsubMsg) ReceiveMsg() {
 	//Setup pubsub client and begin listening for events
 	ctx := context.Background()
 	pubsubClient, err := pubsub.NewClient(ctx, projectEnv)
 	if err != nil {
 		log.Error(err)
 	}
+
+	//Listen forever for messages from our subscription
 	subscription := pubsubClient.Subscription(subscriptionEnv)
 	subscription.ReceiveSettings.MaxExtension = 10 * time.Second
 	log.Info("Listening for events")
@@ -38,29 +49,20 @@ func main() {
 	}
 }
 
+//Pulls msg info, creates a tmevents client, and pushes the event.
+//Returns before acking msg if there's an error.
 func callback(ctx context.Context, msg *pubsub.Message) {
 	log.Info("Processing msg ID: ", msg.ID)
 
-	//Setup event info
-	event := &v01.Event{
-		ContentType: "application/json",
-		Data:        msg.Data,
+	eventInfo := tmevents.EventInfo{
+		EventData:   msg.Data,
 		EventID:     msg.ID,
-		EventTime:   &msg.PublishTime,
+		EventTime:   msg.PublishTime,
 		EventType:   "cloudevent.greet.you",
-		Source:      "from-galaxy-far-far-away",
+		EventSource: "pubsub",
 	}
-
-	//Marshal up event JSON and prepare request
-	marshaller := v01.NewDefaultHTTPMarshaller()
-	req, _ := http.NewRequest("POST", "http://"+channelEnv+"-channel."+namespaceEnv+".svc.cluster.local", nil)
-	err := marshaller.ToRequest(req, event)
-	if err != nil {
-		log.Error(err)
-	}
-
-	//Issue POST request, but return before acking the message if there's an error
-	_, err = (*http.Client).Do(&http.Client{}, req)
+	url := "http://" + channelEnv + "-channel." + namespaceEnv + ".svc.cluster.local"
+	err := tmevents.PushEvent(&eventInfo, url)
 	if err != nil {
 		log.Error(err)
 		return

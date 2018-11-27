@@ -61,6 +61,14 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:38b076fe56defc3f57762c10937ea8b43786f19c740889da87f8974dbc3aca56"
+  name = "github.com/rsmitty/tmevents"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "adbc12e931b78a6defee0d9288265dd0f3d13d5c"
+
+[[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -98,7 +106,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "e657309f52e71501f9934566ac06dc5c2f7f11a1"
+  revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
 
 [[projects]]
   branch = "master"
@@ -178,7 +186,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d84a8228e69fccd89c649456a41d6ba942d4952a20add12b3e50d515aff22c68"
+  digest = "1:2e81813e8e072aa700e101369890e55539729d817d32dbc3fab228d6b40c4d83"
   name = "google.golang.org/api"
   packages = [
     "googleapi/transport",
@@ -192,7 +200,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "faade3cbb06a30202f2da53a8a5e3c4afe60b0c2"
+  revision = "bed42c95df7d5f673175b43d85f6b4047efe3814"
 
 [[projects]]
   digest = "1:b13819327be647014031c6a194299da87ca35313bfc01fdc1da7bd3ddf08cbce"
@@ -270,7 +278,7 @@
   analyzer-version = 1
   input-imports = [
     "cloud.google.com/go/pubsub",
-    "github.com/cloudevents/sdk-go/v01",
+    "github.com/rsmitty/tmevents",
     "github.com/sirupsen/logrus",
   ]
   solver-name = "gps-cdcl"
